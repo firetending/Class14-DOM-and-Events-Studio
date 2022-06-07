@@ -15,10 +15,13 @@ window.addEventListener("load", function () {
     let rocket = this.document.getElementById("rocket");
     let statusInFlight = "Shuttle in flight.";
 
-    //set rocket position within shuttleBackground
+    //set rocket position and establish background limits
+    let startLeft = Math.round((1 - (rocket.width / shuttleBackground.clientWidth)) * 100 / 2);
+    let maxBottom = Math.round((shuttleBackground.clientHeight - rocket.height) / shuttleBackground.clientHeight * 100);
+    let maxLeft = Math.round((shuttleBackground.clientWidth - rocket.width) / shuttleBackground.clientWidth * 100);
     rocket.style.position = "absolute";
-    rocket.style.bottom = "0px";
-    rocket.style.left = "0px";
+    rocket.style.bottom = "0%";
+    rocket.style.left = startLeft + "%";
 
     function printRocketPosition() {
         console.log("top: " + rocket.style.top);
@@ -41,22 +44,35 @@ window.addEventListener("load", function () {
         return output;
     }
 
-    function moveRocket(direction, px = 10) {
+    function lessThanMaxBottom(input) {
+        return input <= maxBottom;
+    }
+
+    function lessThanMaxLeft(input) {
+        return input <= maxLeft;
+    }
+
+    function moveRocket(direction, pct = 5) {
         if (!isInFlight("alertWhenFalse")) {
             return;
         }
+        let newPos = 0;
         if (direction === "up") {
-            rocket.style.bottom = parseInt(rocket.style.bottom) + px + "px";
+            newPos = parseInt(rocket.style.bottom) + pct
+            if (lessThanMaxBottom(newPos)) rocket.style.bottom = newPos + "%";
             spaceShuttleHeight.innerHTML = Number(spaceShuttleHeight.innerHTML) + 10000;
         } else if (direction === "down") {
-            rocket.style.bottom = parseInt(rocket.style.bottom) - px + "px";
+            newPos = parseInt(rocket.style.bottom) - pct
+            if (newPos >= 0) rocket.style.bottom = newPos + "%";
             spaceShuttleHeight.innerHTML = Number(spaceShuttleHeight.innerHTML) - 10000;
         } else if (direction === "left") {
-            rocket.style.left = parseInt(rocket.style.left) - px + "px";
+            newPos = parseInt(rocket.style.left) - pct;
+            if (newPos >= 0) rocket.style.left = newPos + "%";
         } else if (direction === "right") {
-            rocket.style.left = parseInt(rocket.style.left) + px + "px";
+            newPos = parseInt(rocket.style.left) + pct;
+            if (lessThanMaxLeft(newPos)) rocket.style.left = newPos + "%";
         } else if (direction === "land" || direction === "abort") {
-            rocket.style.bottom = "0px";
+            rocket.style.bottom = "0%";
             shuttleBackground.style.background = "green";
             spaceShuttleHeight.innerHTML = 0;
             if (direction === "land") {
@@ -109,10 +125,14 @@ window.addEventListener("load", function () {
     });
 
     left.addEventListener("click", function (event) {
+        //recalculate width of relative background
+        maxLeft = Math.round((shuttleBackground.clientWidth - rocket.width) / shuttleBackground.clientWidth * 100);
         moveRocket("left");
     });
 
     right.addEventListener("click", function (event) {
+        //recalculate width of relative background
+        maxLeft = Math.round((shuttleBackground.clientWidth - rocket.width) / shuttleBackground.clientWidth * 100);
         moveRocket("right");
     });
 
