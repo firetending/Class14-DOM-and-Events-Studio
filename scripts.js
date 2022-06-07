@@ -73,6 +73,7 @@ window.addEventListener("load", function () {
             if (lessThanMaxLeft(newPos)) rocket.style.left = newPos + "%";
         } else if (direction === "land" || direction === "abort") {
             rocket.style.bottom = "0%";
+            rocket.style.left = startLeft + "%"
             shuttleBackground.style.background = "green";
             spaceShuttleHeight.innerHTML = 0;
             if (direction === "land") {
